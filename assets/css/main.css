@@ -1,0 +1,41 @@
+@import "tailwindcss";
+@import './font.css';
+@import "@nuxt/ui";
+
+
+
+body{
+    background-color: white;
+    font-family: 'exo';
+    overflow: hidden;
+}
+
+.bg-primary{
+    background-color: #100926;
+}
+
+.color-label{
+    color: #F0EBF7;
+}
+.color-input{
+   background-color: #251D42 ;
+   width: 278px;
+   height:36px ;
+
+}
+
+.color-btn{
+    background-color: #604EA7;
+    color: white;
+   
+}
+.size-btn{
+     width: 278px;
+   height:36px ;
+}
+.border-color{
+    color: #251D42;
+}
+.color-btn-gp{
+    background-color: #392D66;
+}
