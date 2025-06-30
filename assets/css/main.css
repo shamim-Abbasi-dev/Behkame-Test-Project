@@ -2,12 +2,13 @@
 @import './font.css';
 @import "@nuxt/ui";
 
-
-
-body{
+html,body{
     background-color: white;
     font-family: 'exo';
-    overflow: hidden;
+    overflow: hidden; 
+
+    
+ 
 }
 
 .bg-primary{
@@ -37,5 +38,46 @@ body{
     color: #251D42;
 }
 .color-btn-gp{
+    background-color: #392D66;
+}
+
+.Dark-1{
+    background-color: #251D42;
+}
+.Dark-2{
+    background-color: #604EA7;
+}
+.primary{
+    background-color: #604EA7;
+}
+.primary-light{
+    background-color: #755FCC;
+}
+.primary-light-color{
+    color: #755FCC;
+}
+.Complimentary{
+    background-color: #FFC700;
+}
+.button-2{
+    background-color:#CC5F5F ;
+}
+.button-bg-icon-under{
+    background-color: #61CC5F66;
+}
+.button-bg-icon-up{
+    background-color: #61CC5F;
+}
+.icon-rocket-color{
+    color: #61CC5F66;
+}
+
+.light-1{
+    color: #F0EBF7;
+}
+.Dark-3{
+    color: #392D66;
+}
+.Dark-3-bg{
     background-color: #392D66;
 }

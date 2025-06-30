@@ -43,4 +43,9 @@
     <button class="color-btn rounded-[8px] text-[14px]">Register</button>
   </form>
 </template>
-<script setup lang="ts"></script>
+<script setup lang="ts">
+function onSubmit(){
+  
+}
+
+</script>
