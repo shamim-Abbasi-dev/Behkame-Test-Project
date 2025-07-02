@@ -24,7 +24,7 @@
             </div>
          
 
-          <div class="text-white text-bold text-center">Creat Group</div>
+          <div class="text-white text-bold text-center">{{ isEdit ? 'Edit Group' : 'Create Group' }}</div>
           <div class="flex flex-row gap-[16px] align-center justify-center">
             <div>
               <label class="color-label text-[14px] " for="name">Name</label>
@@ -55,29 +55,68 @@
 </div>
           </div>
         </div>
-          <button class="primary text-white rounded-[8px] h-[49px] w-full mt-[10px]" > Creat</button>
+          <button @click="handleSave" class="primary text-white rounded-[8px] h-[49px] w-full mt-[10px]" >{{isEdit ? 'Edit' : 'Create'}}</button>
 
       </div>
     </div>
   </transition>
 </template>
 
-<script setup>
-import { ref } from "vue";
+<script setup lang="ts">
+import { ref, watch } from 'vue'
+import { useProjectStore } from '@/stores/project'
+const store = useProjectStore()
 
-defineProps({
-  modelValue: Boolean,
-});
-defineEmits(["update:modelValue"]);
+
+
+const emit = defineEmits(["update:modelValue"]);
+
+
+const props = defineProps<{
+  show: boolean
+  editProject?: { id: number; title: string; url: string } | null
+  modelValue: Boolean
+}>()
+
+const form = ref({
+  title: '',
+  url: ''
+})
+
+const isEdit = ref(false)
+watch(
+  () => props.editProject,
+  (val) => {
+    if (val) {
+      form.value = { title: val.title, url: val.url }
+      isEdit.value = true
+    } else {
+      form.value = { title: '', url: '' }
+      isEdit.value = false
+    }
+  },
+  { immediate: true }
+)
+const handleSave = () => {
+  if (isEdit.value && props.editProject) {
+    store.updateProject({
+      id: props.editProject.id,
+      ...form.value
+    })
+  } else {
+    store.addProject(form.value)
+  }
+  
+}
 
 const startY = ref(0);
 const dragOffset = ref(0);
 
-function startDrag(e) {
+function startDrag(e: TouchEvent) {
   startY.value = e.touches[0].clientY;
 }
 
-function onDrag(e) {
+function onDrag(e: TouchEvent) {
   const delta = e.touches[0].clientY - startY.value;
   dragOffset.value = delta > 0 ? delta : 0;
 }
