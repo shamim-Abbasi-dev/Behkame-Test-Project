@@ -1,5 +1,5 @@
 <template>
-  <transition name="slide-up">
+  <transition name="slide-up"  @click.self="$emit('close')">
     <div
       v-if="modelValue"
       class="fixed inset-0 w-[360px] h-[950px] mx-auto bg-black/50 flex justify-center items-center z-50"
@@ -22,11 +22,11 @@
           <div class="text-white  text-center">Do you want to run this task ?</div>
 
         
-<div class="flex flex-row gap-4"> <button class="bg-green-500 text-white rounded-[8px] h-[33px] w-full mt-[10px]">
+<div class="flex flex-row gap-4"> <button  @click="confirm" :disabled="loading" class="bg-green-500 text-white rounded-[8px] h-[33px] w-full mt-[10px]">
            Yes
           </button>
           
-          <button class="bg-red-600 text-white rounded-[8px] h-[33px] w-full mt-[10px]">
+          <button @click="close" class="bg-red-600 text-white rounded-[8px] h-[33px] w-full mt-[10px]">
             No
           </button></div>
          
@@ -40,6 +40,7 @@
 import { ref } from "vue";
 
 defineProps({
+  
   modelValue: Boolean,
 });
 defineEmits(["update:modelValue"]);

@@ -1,9 +1,9 @@
 <template>
   <transition name="slide-up">
     <div
-      v-if="modelValue"
-      class="fixed inset-0 w-[360px] h-[950px]  mx-auto bg-black/50  flex justify-center items-end"
-      @click.self="$emit('update:modelValue', false)"
+      v-if="show"
+  class="fixed inset-0 w-[360px] h-[950px]  mx-auto bg-black/50  flex justify-center items-end"
+  @click.self="$emit('update:show', false)"
     >
       <div
         ref="modal"
@@ -24,17 +24,19 @@
             </div>
          
 
-          <div class="text-white text-bold text-center">{{ isEdit ? 'Edit Group' : 'Create Group' }}</div>
+          <div class="text-white text-bold text-center">{{  props.editProject ? 'Edit group' : 'Create group' }}</div>
           <div class="flex flex-row gap-[16px] align-center justify-center">
             <div>
               <label class="color-label text-[14px] " for="name">Name</label>
             </div>
             <div>
               <input
+              v-model="form.title"
                 type="text"
                 class="bg-white/10 rounded-[8px] h-[36px] w-[206] outline-none px-4 text-amber-50"
                 name="name"
               />
+              <p v-if="errors.title" class="text-red-500 text-sm">{{ errors.title }}</p>
             </div>
           </div>
           <hr class="w-full Dark-3">
@@ -45,6 +47,8 @@
     id="fileInput"
     name="fileName"
     class="hidden"
+     @change="handleFileChange"
+    
   />
   <label
     for="fileInput"
@@ -55,7 +59,7 @@
 </div>
           </div>
         </div>
-          <button @click="handleSave" class="primary text-white rounded-[8px] h-[49px] w-full mt-[10px]" >{{isEdit ? 'Edit' : 'Create'}}</button>
+          <button @click="submit" class="primary text-white rounded-[8px] h-[49px] w-full mt-[10px]" >{{  props.editProject ? 'Edit' : 'Create' }}</button>
 
       </div>
     </div>
@@ -64,50 +68,71 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { useProjectStore } from '@/stores/project'
-const store = useProjectStore()
 
-
-
-const emit = defineEmits(["update:modelValue"]);
+const errors = ref<Record<string, string>>({})
 
 
 const props = defineProps<{
   show: boolean
   editProject?: { id: number; title: string; url: string } | null
-  modelValue: Boolean
 }>()
 
-const form = ref({
-  title: '',
-  url: ''
-})
+const emit = defineEmits<{
+  (e: 'update:show', value: boolean): void
+  (e: 'save', project: { id: number; title: string; url: string }): void
+}>()
 
-const isEdit = ref(false)
+const form = ref<{ title: string; url: string }>({ title: '', url: '' })
+
 watch(
   () => props.editProject,
-  (val) => {
-    if (val) {
-      form.value = { title: val.title, url: val.url }
-      isEdit.value = true
-    } else {
-      form.value = { title: '', url: '' }
-      isEdit.value = false
-    }
+  (p) => {
+    form.value.title = p?.title ?? ''
+    form.value.url   = p?.url   ?? ''
   },
   { immediate: true }
 )
-const handleSave = () => {
-  if (isEdit.value && props.editProject) {
-    store.updateProject({
-      id: props.editProject.id,
-      ...form.value
-    })
-  } else {
-    store.addProject(form.value)
-  }
-  
+
+/* helpers */
+function close () {
+  emit('update:show', false)          
 }
+function handleFileChange(event: Event) {
+  const input = event.target as HTMLInputElement
+  if (input.files && input.files[0]) {
+   
+    const file = input.files[0]
+
+    
+    form.value.url = URL.createObjectURL(file)
+
+   
+  }
+}
+function validate() {
+  errors.value = {}
+
+  if (!form.value.title.trim()) errors.value.title = 'Name is required.'
+
+
+  return Object.keys(errors.value).length === 0
+}
+function submit () {
+  if (!validate()) return
+  const trimmedTitle = form.value.title.trim()
+  
+  if (!trimmedTitle) return             // simple validation
+
+  emit('save', {
+    id: props.editProject?.id ?? Date.now(),           // new or existing id
+    title: trimmedTitle,
+    url :form.value.url
+    
+  })                                                   // ❷ return data
+  close()
+}
+
+
 
 const startY = ref(0);
 const dragOffset = ref(0);
@@ -123,11 +148,11 @@ function onDrag(e: TouchEvent) {
 
 function endDrag() {
   if (dragOffset.value > 100) {
-    // Close modal if pulled down far enough
+   
     dragOffset.value = 0;
-    emit("update:modelValue", false);
+    emit("update:show", false);
   } else {
-    // Snap back if not far enough
+    
     dragOffset.value = 0;
   }
 }

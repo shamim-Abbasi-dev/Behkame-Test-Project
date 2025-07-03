@@ -68,67 +68,57 @@
   </form>
 </template>
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { reactive, ref } from 'vue'
+import { useAuthStore } from '~/stores/auth'
+
+const auth = useAuthStore()
 
 interface RegisterForm {
-  access: string;
-  password: string;
-  re_password: string;
+  access: string
+  password: string
+  re_password: string
 }
 
 const formData = reactive<RegisterForm>({
-  access: "",
-  password: "",
-  re_password: "",
-});
+  access: '',
+  password: '',
+  re_password: '',
+})
 
-const errors = ref<string[]>([]);
-const successMessage = ref<string>("");
+const errors = ref<string[]>([])
+const successMessage = ref('')
 
-const onSubmit = (): void => {
-  errors.value = [];
-  successMessage.value = "";
+const onSubmit = async () => {
+  errors.value = []
+  successMessage.value = ''
 
-  // Validation
+  // 1. basic validation
   if (!formData.access || !formData.password || !formData.re_password) {
-    errors.value.push("All fields are required.");
-    return;
+    errors.value.push('All fields are required.')
+    return
   }
-
   if (formData.password !== formData.re_password) {
-    errors.value.push("Passwords do not match.");
-    return;
+    errors.value.push('Passwords do not match.')
+    return
+  }
+
+  // 2. duplicate user check
+  const existing = localStorage.getItem('user')
+  if (existing && JSON.parse(existing).access === formData.access) {
+    errors.value.push('Access token already exists.')
+    return           
   }
 
 
-  const existingUser = localStorage.getItem("user");
-if (existingUser) {
-  const parsedUser = JSON.parse(existingUser);
-  if (parsedUser.access === formData.access) {
-    errors.value.push("Access token already exists.");
-    navigateTo("/login");
-       
-  }
-}
-
- 
   const user = {
     access: formData.access,
     password: formData.password,
     token: formData.access,
-  };
+  }
+  localStorage.setItem('user', JSON.stringify(user))
 
-  localStorage.setItem("user", JSON.stringify(user));
-
- 
-  successMessage.value = "Registration successful! Redirecting to login...";
-
-  
-  
-    setTimeout(async () => {
-    await navigateTo("/login");
-  }, 1500);
-};
-  
-
+  successMessage.value = 'Registration successful! Redirecting…'
+  setTimeout(() => navigateTo('/login'), 1200)
+}
 </script>
+

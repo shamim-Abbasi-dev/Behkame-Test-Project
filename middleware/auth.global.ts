@@ -18,11 +18,7 @@ export default defineNuxtRouteMiddleware((to) => {
     return navigateTo('/groups');
   }
 
-  if (to.path === '/groups' && !token && passwordAccess !== 'true' && !auth.isAuth) {
-    return navigateTo('/');
-  }
-
   if (!token && !publicPages.includes(to.path) && !auth.isAuth) {
-    return navigateTo('/');
+    return navigateTo('/' ,{ external: true });
   }
 });

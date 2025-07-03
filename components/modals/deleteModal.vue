@@ -29,12 +29,12 @@
          
         </div>
          <div class="flex flex-row gap-[16px] justify-center align-super">
-            <button
+            <button @click="$emit('confirm')"
               class="bg-red-600 text-white rounded-[8px] w-[156px] h-[33px]  mt-[10px]"
             >
               Delete
             </button>
-            <button
+            <button @click="$emit('cancel')"
               class="primary text-white rounded-[8px] w-[156px] h-[33px]  mt-[10px]"
             >
               Cancel
@@ -51,7 +51,7 @@ import { ref } from "vue";
 defineProps({
   modelValue: Boolean,
 });
-defineEmits(["update:modelValue"]);
+defineEmits(["update:modelValue" ,"confirm", "cancel"]);
 
 const startY = ref(0);
 const dragOffset = ref(0);
