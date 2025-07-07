@@ -1,76 +1,88 @@
 <template>
-  <transition name="slide-up"  @click.self="$emit('close')">
+  <transition name="slide-up">
     <div
       v-if="modelValue"
-      class="fixed inset-0 w-[360px] h-[950px] mx-auto bg-black/50 flex justify-center items-center z-50"
-      @click.self="$emit('update:modelValue', false)"
+      class="fixed inset-0 mx-auto h-[950px] w-[360px] bg-black/50 flex items-center justify-center z-50"
+      @click.self="close"
     >
       <div
         ref="modal"
-        class="Dark-1 w-5/6 rounded-[24px]  p-4 text-black touch-none bg-[#111]"
+        class="Dark-1 w-5/6 rounded-[24px] bg-[#111] p-4 text-white touch-none"
+        :style="{ transform: `translateY(${dragOffset}px)` }"
         @touchstart="startDrag"
         @touchmove="onDrag"
         @touchend="endDrag"
-        :style="{ transform: `translateY(${dragOffset}px)` }"
       >
-        <!-- Modal Content -->
-        <div class="flex flex-col gap-3">
-          <div class="text-center text-white font-bold">
-          Run Task
-          </div>
+        <h2 class="text-center font-bold mb-2">Run Task</h2>
+        <p class="text-center mb-6">Do you want to run this task?</p>
 
-          <div class="text-white  text-center">Do you want to run this task ?</div>
-
-        
-<div class="flex flex-row gap-4"> <button  @click="confirm" :disabled="loading" class="bg-green-500 text-white rounded-[8px] h-[33px] w-full mt-[10px]">
-           Yes
+        <div class="flex gap-4">
+          <button
+            class="w-full h-[33px] rounded-[8px] bg-green-500"
+            @click="confirm"
+            :disabled="loading"
+          >
+            Yes <span v-if="loading">⏳</span>
           </button>
-          
-          <button @click="close" class="bg-red-600 text-white rounded-[8px] h-[33px] w-full mt-[10px]">
+          <button
+            class="w-full h-[33px] rounded-[8px] bg-red-600"
+            @click="close"
+            :disabled="loading"
+          >
             No
-          </button></div>
-         
-          
+          </button>
         </div>
       </div>
     </div>
   </transition>
 </template>
-<script setup>
-import { ref } from "vue";
 
-defineProps({
-  
-  modelValue: Boolean,
-});
-defineEmits(["update:modelValue"]);
+<script setup lang="ts">
+import { ref, defineProps, defineEmits } from 'vue'
+import type { Task } from '@/stores/task'
 
-const startY = ref(0);
-const dragOffset = ref(0);
+const props = defineProps<{
+  modelValue: boolean
+  task: Task | null
+}>()
 
-function startDrag(e) {
-  startY.value = e.touches[0].clientY;
+const emit = defineEmits<{
+  (e: 'update:modelValue', v: boolean): void
+  (e: 'yes'): void
+}>()
+
+const loading = ref(false)
+const startY = ref(0)
+const dragOffset = ref(0)
+
+function close(): void {
+  if (!loading.value) emit('update:modelValue', false)
 }
 
-function onDrag(e) {
-  const delta = e.touches[0].clientY - startY.value;
-  dragOffset.value = delta > 0 ? delta : 0;
+function confirm(): void {
+  loading.value = true
+  emit('yes')
 }
 
-function endDrag() {
-  if (dragOffset.value > 100) {
-    dragOffset.value = 0;
-    emit("update:modelValue", false);
-  } else {
-    dragOffset.value = 0;
-  }
+function startDrag(e: TouchEvent): void {
+  startY.value = e.touches[0].clientY
+}
+
+function onDrag(e: TouchEvent): void {
+  const delta = e.touches[0].clientY - startY.value
+  dragOffset.value = Math.max(delta, 0)
+}
+
+function endDrag(): void {
+  if (dragOffset.value > 100) close()
+  dragOffset.value = 0
 }
 </script>
 
 <style scoped>
 .slide-up-enter-active,
 .slide-up-leave-active {
-  transition: transform 0.5s ease-in-out, opacity 0.5s ease;
+  transition: transform 0.35s ease, opacity 0.35s ease;
 }
 .slide-up-enter-from,
 .slide-up-leave-to {

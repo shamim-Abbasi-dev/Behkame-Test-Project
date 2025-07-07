@@ -1,5 +1,11 @@
 <template>
-  <div>
+  <div
+    v-if="loading"
+    class="flex justify-center items-center h-screen text-white text-lg"
+  >
+    Loading...
+  </div>
+  <div v-else>
     <div class="flex flex-row justify-between p-[24px] border-b-1 border-color">
       <div class="text-amber-50 text-[16px] font-[600]">Groups</div>
 
@@ -27,24 +33,28 @@
       </div>
     </div>
 
-    <div class="p-[24px] ">
-      
-        <div v-if="store.projects.length === 0" class="text-white text-center text-lg">No Group Found</div>
-      
-      <div v-else class="flex flex-col space-y-3">
-        <groupCard 
+    <div class="p-[24px]">
+      <div
+        v-if="projectStore.projects.length === 0"
+        class="text-white text-center text-lg"
+      >
+        No Group Found
+      </div>
 
-          v-for="p in store.projects"
+      <div v-else class="flex flex-col space-y-3">
+        <groupCard
+          v-for="p in projectStore.projects"
           :key="p.id"
           :project="p"
           @edit="openModal(p)"
-          @delete="store.deleteProject"
+          @delete="projectStore.deleteProject"
         />
       </div>
     </div>
   </div>
   <div>
     <projectModal
+      :key="modalKey"
       :show="showModal"
       :modelValue="showModal"
       :editProject="selectedProject"
@@ -55,13 +65,15 @@
 </template>
 <script lang="ts" setup>
 import projectModal from "@/components/modals/createEditGroupModal.vue";
-import groupCard from "@/components/card.vue";
+import groupCard from "~/components/groupCard.vue";
 import { useAuthStore } from "~/stores/auth";
 import { useProjectStore } from "@/stores/project";
 import { navigateTo } from "#app";
-
-const store = useProjectStore();
 const auth = useAuthStore();
+const projectStore = useProjectStore();
+
+const modalKey = ref(0);
+const loading = ref(true);
 
 const showModal = ref(false);
 interface Project {
@@ -74,14 +86,16 @@ const selectedProject = ref<Project | null>(null);
 
 function openModal(project: Project | null = null) {
   selectedProject.value = project;
+  modalKey.value++;
+
   showModal.value = true;
 }
 
 function onSave(project: Project) {
   if (selectedProject.value) {
-    store.updateProject(project);
+    projectStore.updateProject(project);
   } else {
-    store.addProject({ title: project.title, url: project.url });
+    projectStore.addProject({ title: project.title, url: project.url });
   }
   showModal.value = false;
   selectedProject.value = null;
@@ -92,11 +106,9 @@ function logout() {
   navigateTo("/login");
 }
 
-onMounted(() => {
-  
-    store.loadProjectsFromStorage()
- 
- 
-})
-
+onMounted(async () => {
+  await auth.hydrate();
+  await projectStore.load();
+  loading.value = false;
+});
 </script>

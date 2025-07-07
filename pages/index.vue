@@ -1,7 +1,7 @@
 <template>
   <div class="flex justify-center mt-[48px]">
-    <NuxtImg src="./public/logoo.png" alt="Logo" width="70px" height="35px" />
-    <div class="text-white font-[600]">Hi</div>
+    <img src="../public/logoo.png" alt="Logo"  />
+   
   </div>
   <div
     v-if="errors.length"
@@ -69,9 +69,6 @@
 </template>
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { useAuthStore } from '~/stores/auth'
-
-const auth = useAuthStore()
 
 interface RegisterForm {
   access: string
@@ -86,34 +83,34 @@ const formData = reactive<RegisterForm>({
 })
 
 const errors = ref<string[]>([])
-const successMessage = ref('')
+const successMessage = ref<string>('')
 
-const onSubmit = async () => {
+const onSubmit = async (): Promise<void> => {
   errors.value = []
   successMessage.value = ''
 
-  // 1. basic validation
   if (!formData.access || !formData.password || !formData.re_password) {
     errors.value.push('All fields are required.')
     return
   }
+
   if (formData.password !== formData.re_password) {
     errors.value.push('Passwords do not match.')
     return
   }
 
-  // 2. duplicate user check
   const existing = localStorage.getItem('user')
-  if (existing && JSON.parse(existing).access === formData.access) {
-    errors.value.push('Access token already exists.')
-    return           
+  if (existing) {
+    const parsedUser = JSON.parse(existing)
+    if (parsedUser.access === formData.access) {
+      errors.value.push('Access token already exists.')
+      return
+    }
   }
-
 
   const user = {
     access: formData.access,
     password: formData.password,
-    token: formData.access,
   }
   localStorage.setItem('user', JSON.stringify(user))
 
@@ -121,4 +118,3 @@ const onSubmit = async () => {
   setTimeout(() => navigateTo('/login'), 1200)
 }
 </script>
-

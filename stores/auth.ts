@@ -1,37 +1,37 @@
-// 
-import { defineStore } from 'pinia'
+
+import { defineStore } from "pinia";
+import { useProjectStore } from "@/stores/project";
+import { useTaskStore } from "@/stores/task";
 
 interface AuthState {
-  userId: string | null
-  token: string | null
+  isAuth: boolean;
+  token: string | null;
 }
 
-export const useAuthStore = defineStore('auth', {
+export const useAuthStore = defineStore("auth", {
   state: (): AuthState => ({
-    userId: null,
-    token: null
+    isAuth: false,
+    token: null,
   }),
 
   actions: {
-    /** فراخوانی هنگام لاگین موفق */
-    login({ userId, token }: { userId: string; token: string }) {
-      this.userId = userId
-      this.token  = token
-      localStorage.setItem('userId', userId)
-      localStorage.setItem('token',  token)
+
+    logout():void {
+      this.token = null;
+      this.isAuth = false;
+
+      localStorage.removeItem("token");
+
+      useProjectStore().$reset();
+      useTaskStore().$reset();
     },
 
-    /** خروج از حساب */
-    logout() {
-      this.userId = this.token = null
-      localStorage.removeItem('userId')
-      localStorage.removeItem('token')
-    },
+    hydrate() :void {
+      const token = localStorage.getItem("token");
+      const isAuth = localStorage.getItem("isAuth") === "true";
 
-    /** بازیابی وضعیت پس از رفرش صفحه */
-    hydrate() {
-      this.userId = localStorage.getItem('userId')
-      this.token  = localStorage.getItem('token')
-    }
-  }
-})
+      this.token = token;
+      this.isAuth = isAuth && !!token;
+    },
+  },
+});
