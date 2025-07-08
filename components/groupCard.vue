@@ -30,13 +30,10 @@
     </div>
   </div>
 
-  <DeleteModal v-model="showDeleteModal" @confirm="confirmDelete" @cancel="showDeleteModal = false" />
+  <ModalsDeleteModal v-model="showDeleteModal" @confirm="confirmDelete" @cancel="showDeleteModal = false" />
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import DeleteModal from './modals/deleteModal.vue'
 
 const props = defineProps<{
   project: { id: number; title: string; url: string }
@@ -51,20 +48,20 @@ const router = useRouter()
 const hasError = ref<boolean>(false)
 const showDeleteModal = ref<boolean>(false)
 
-function goToTasks(): void {
+const goToTasks = (): void =>{
   router.push(`/tasks/${props.project.id}`)
 }
 
-function handleEdit(): void {
+const handleEdit = (): void =>{
   emit('edit', props.project)
 }
 
-function confirmDelete(): void {
+const  confirmDelete = (): void => {
   emit('delete', props.project.id)
   showDeleteModal.value = false
 }
 
-function onImageError(): void {
+const onImageError =(): void => {
   hasError.value = true
   props.project.url = ''
 }

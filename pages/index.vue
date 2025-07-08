@@ -68,7 +68,7 @@
   </form>
 </template>
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+
 
 interface RegisterForm {
   access: string

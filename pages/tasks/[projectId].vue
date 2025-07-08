@@ -45,14 +45,14 @@
       </p>
     </div>
 
-    <TaskModal
+    <ModalsCreateEditTaskModal
       :key="modalKey"
       :model-value="showModal"
       @update:model-value="showModal = $event"
       :project-id="projectId"
       :edit-task="editingTask"
     />
-    <RunTaskMessage
+    <ModalsRunTask
       v-model="showRunModal"
       :task="selectedTask"
       @yes="runTask"
@@ -62,16 +62,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
-import { useRoute } from "vue-router";
-import TaskCard from "../../components/taskCard.vue";
-import TaskModal from "../../components/modals/createEditTaskModal.vue";
-import { useTaskStore, type Task } from "@/stores/task";
+import { useTaskStore} from "@/stores/task";
 import { useProjectStore } from "@/stores/project";
-import RunTaskMessage from "@/components/modals/runTask.vue";
 import { useAuthStore } from "@/stores/auth";
+import type { Task } from '@/models/task'
+import type { Project } from '@/models/project'
 
 
+definePageMeta({
+    middleware: 'auth',
+});
 const loading = ref(true);
 const modalKey = ref(0);
 const route = useRoute();
@@ -80,11 +80,13 @@ const taskStore = useTaskStore();
 const projectStore = useProjectStore();
 const auth = useAuthStore();
 
+
 const projectTitle = computed((): string => {
   return (
     projectStore.projects.find((p) => p.id === projectId)?.title || "Project"
   );
 });
+
 
 const selectedTask = ref<Task | null>(null);
 const showRunModal = ref(false);
@@ -97,30 +99,32 @@ onMounted(async() => {
   loading.value = false;
 });
 
-const tasks = computed(() => taskStore.tasksByProject(projectId));
+const tasks = taskStore.tasksByProject(projectId);
 
-function openModal(task: Task | null = null): void {
+
+const openModal = (task: Task | null = null): void => {
   editingTask.value = task;
   modalKey.value++;
-
   showModal.value = true;
 }
-function openRunModal(task: Task) {
+
+const openRunModal = (task: Task): void => {
   selectedTask.value = task;
   showRunModal.value = true;
 }
 
-function handleDelete(id: number): void {
+const handleDelete = (id: number): void => {
   taskStore.deleteTask(id, projectId);
 }
-async function runTask() {
+
+const runTask = async (): Promise<void> => {
   if (!selectedTask.value) return;
   showRunModal.value = false;
 
   const task = selectedTask.value;
   if (!auth.token) {
-    alert("توکن موجود نیست. لطفا وارد شوید.");
-    return; // یا هر کار دیگری
+    alert("Token not exist , please login");
+    return;
   }
 
   try {
@@ -148,4 +152,9 @@ async function runTask() {
     alert("Error: " + err);
   }
 }
+
 </script>
+<style>
+
+
+</style>

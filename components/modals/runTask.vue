@@ -38,8 +38,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineEmits } from 'vue'
-import type { Task } from '@/stores/task'
+import type { Task } from '@/models/task'
+
 
 const props = defineProps<{
   modelValue: boolean
@@ -55,28 +55,29 @@ const loading = ref(false)
 const startY = ref(0)
 const dragOffset = ref(0)
 
-function close(): void {
-  if (!loading.value) emit('update:modelValue', false)
+const close = (): void => {
+  if (!loading.value) emit('update:modelValue', false);
 }
 
-function confirm(): void {
-  loading.value = true
-  emit('yes')
+const confirm = (): void => {
+  loading.value = true;
+  emit('yes');
 }
 
-function startDrag(e: TouchEvent): void {
-  startY.value = e.touches[0].clientY
+const startDrag = (e: TouchEvent): void => {
+  startY.value = e.touches[0].clientY;
 }
 
-function onDrag(e: TouchEvent): void {
-  const delta = e.touches[0].clientY - startY.value
-  dragOffset.value = Math.max(delta, 0)
+const onDrag = (e: TouchEvent): void => {
+  const delta = e.touches[0].clientY - startY.value;
+  dragOffset.value = Math.max(delta, 0);
 }
 
-function endDrag(): void {
-  if (dragOffset.value > 100) close()
-  dragOffset.value = 0
+const endDrag = (): void => {
+  if (dragOffset.value > 100) close();
+  dragOffset.value = 0;
 }
+
 </script>
 
 <style scoped>

@@ -112,8 +112,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
-import { useTaskStore, type Task } from '@/stores/task'
+import { useTaskStore} from '@/stores/task'
+import type { Task } from '@/models/task'
+
 
 const errors = ref<{ [key: string]: string }>({})
 
@@ -150,42 +151,43 @@ watch(
   { immediate: true }
 )
 
-function validate(): boolean {
-  errors.value = {}
-  if (!form.value.name.trim()) errors.value.name = 'Name is required.'
-  if (!form.value.id || form.value.id <= 0) errors.value.id = 'ID must be a positive number.'
-  if (!form.value.token.trim()) errors.value.token = 'Token is required.'
-  if (!form.value.ref.trim()) errors.value.ref = 'REF is required.'
-  if (!form.value.trigger.trim()) errors.value.trigger = 'Trigger is required.'
-  return Object.keys(errors.value).length === 0
+const validate = (): boolean => {
+  errors.value = {};
+  if (!form.value.name.trim()) errors.value.name = 'Name is required.';
+  if (!form.value.id || form.value.id <= 0) errors.value.id = 'ID must be a positive number.';
+  if (!form.value.token.trim()) errors.value.token = 'Token is required.';
+  if (!form.value.ref.trim()) errors.value.ref = 'REF is required.';
+  if (!form.value.trigger.trim()) errors.value.trigger = 'Trigger is required.';
+  return Object.keys(errors.value).length === 0;
 }
 
-function handleSave(): void {
-  if (!validate()) return
+const handleSave = (): void => {
+  if (!validate()) return;
   if (isEdit.value) {
-    store.update(form.value)
+    store.update(form.value);
   } else {
-    store.add(form.value)
+    store.add(form.value);
   }
-  emit('update:modelValue', false)
+  emit('update:modelValue', false);
 }
 
-const startY = ref(0)
-const dragOffset = ref(0)
+const startY = ref(0);
+const dragOffset = ref(0);
 
-function startDrag(e: TouchEvent): void {
-  startY.value = e.touches[0].clientY
+const startDrag = (e: TouchEvent): void => {
+  startY.value = e.touches[0].clientY;
 }
 
-function onDrag(e: TouchEvent): void {
-  const delta = e.touches[0].clientY - startY.value
-  dragOffset.value = Math.max(delta, 0)
+const onDrag = (e: TouchEvent): void => {
+  const delta = e.touches[0].clientY - startY.value;
+  dragOffset.value = Math.max(delta, 0);
 }
 
-function endDrag(): void {
-  if (dragOffset.value > 100) emit('update:modelValue', false)
-  dragOffset.value = 0
+const endDrag = (): void => {
+  if (dragOffset.value > 100) emit('update:modelValue', false);
+  dragOffset.value = 0;
 }
+
 </script>
 
 <style scoped>

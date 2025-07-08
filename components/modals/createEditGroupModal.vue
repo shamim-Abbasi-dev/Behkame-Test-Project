@@ -69,7 +69,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
 
 interface Project {
   id: number
@@ -99,53 +98,54 @@ watch(
   { immediate: true }
 )
 
-function close(): void {
-  emit('update:show', false)
+const close = (): void => {
+  emit('update:show', false);
 }
 
-function handleFileChange(event: Event): void {
-  const input = event.target as HTMLInputElement
+const handleFileChange = (event: Event): void => {
+  const input = event.target as HTMLInputElement;
   if (input.files && input.files[0]) {
-    form.value.url = URL.createObjectURL(input.files[0])
+    form.value.url = URL.createObjectURL(input.files[0]);
   }
 }
 
-function validate(): boolean {
-  errors.value = {}
-  if (!form.value.title.trim()) errors.value.title = 'Name is required.'
-  return Object.keys(errors.value).length === 0
+const validate = (): boolean => {
+  errors.value = {};
+  if (!form.value.title.trim()) errors.value.title = 'Name is required.';
+  return Object.keys(errors.value).length === 0;
 }
 
-function submit(): void {
-  if (!validate()) return
+const submit = (): void => {
+  if (!validate()) return;
   emit('save', {
     id: props.editProject?.id ?? Date.now(),
     title: form.value.title.trim(),
     url: form.value.url,
-  })
-  close()
+  });
+  close();
 }
 
-const startY = ref(0)
-const dragOffset = ref(0)
+const startY = ref(0);
+const dragOffset = ref(0);
 
-function startDrag(e: TouchEvent): void {
-  startY.value = e.touches[0].clientY
+const startDrag = (e: TouchEvent): void => {
+  startY.value = e.touches[0].clientY;
 }
 
-function onDrag(e: TouchEvent): void {
-  const delta = e.touches[0].clientY - startY.value
-  dragOffset.value = delta > 0 ? delta : 0
+const onDrag = (e: TouchEvent): void => {
+  const delta = e.touches[0].clientY - startY.value;
+  dragOffset.value = delta > 0 ? delta : 0;
 }
 
-function endDrag(): void {
+const endDrag = (): void => {
   if (dragOffset.value > 100) {
-    dragOffset.value = 0
-    close()
+    dragOffset.value = 0;
+    close();
   } else {
-    dragOffset.value = 0
+    dragOffset.value = 0;
   }
 }
+
 </script>
 
 <style scoped>

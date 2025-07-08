@@ -46,7 +46,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 
 const props = defineProps<{
   modelValue: boolean
@@ -61,27 +60,29 @@ const emit = defineEmits<{
 const startY = ref(0)
 const dragOffset = ref(0)
 
-function close(): void {
-  emit('update:modelValue', false)
+
+const close = (): void => {
+  emit('update:modelValue', false);
 }
 
-function startDrag(e: TouchEvent): void {
-  startY.value = e.touches[0].clientY
+const startDrag = (e: TouchEvent): void => {
+  startY.value = e.touches[0].clientY;
 }
 
-function onDrag(e: TouchEvent): void {
-  const delta = e.touches[0].clientY - startY.value
-  dragOffset.value = delta > 0 ? delta : 0
+const onDrag = (e: TouchEvent): void => {
+  const delta = e.touches[0].clientY - startY.value;
+  dragOffset.value = delta > 0 ? delta : 0;
 }
 
-function endDrag(): void {
+const endDrag = (): void => {
   if (dragOffset.value > 100) {
-    dragOffset.value = 0
-    emit('update:modelValue', false)
+    dragOffset.value = 0;
+    emit('update:modelValue', false);
   } else {
-    dragOffset.value = 0
+    dragOffset.value = 0;
   }
 }
+
 </script>
 
 <style scoped>

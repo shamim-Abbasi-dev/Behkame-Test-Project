@@ -42,7 +42,7 @@
       </div>
 
       <div v-else class="flex flex-col space-y-3">
-        <groupCard
+        <GroupCard
           v-for="p in projectStore.projects"
           :key="p.id"
           :project="p"
@@ -53,7 +53,7 @@
     </div>
   </div>
   <div>
-    <projectModal
+    <ModalsCreateEditGroupModal
       :key="modalKey"
       :show="showModal"
       :modelValue="showModal"
@@ -64,18 +64,20 @@
   </div>
 </template>
 <script lang="ts" setup>
-import projectModal from "@/components/modals/createEditGroupModal.vue";
-import groupCard from "~/components/groupCard.vue";
+definePageMeta({
+    middleware: 'auth',
+});
 import { useAuthStore } from "~/stores/auth";
 import { useProjectStore } from "@/stores/project";
-import { navigateTo } from "#app";
+
 const auth = useAuthStore();
 const projectStore = useProjectStore();
 
 const modalKey = ref(0);
 const loading = ref(true);
-
 const showModal = ref(false);
+
+
 interface Project {
   id: number;
   title: string;
@@ -84,14 +86,13 @@ interface Project {
 
 const selectedProject = ref<Project | null>(null);
 
-function openModal(project: Project | null = null) {
+const openModal = (project: Project | null = null): void => {
   selectedProject.value = project;
   modalKey.value++;
-
   showModal.value = true;
 }
 
-function onSave(project: Project) {
+const onSave = (project: Project): void => {
   if (selectedProject.value) {
     projectStore.updateProject(project);
   } else {
@@ -101,8 +102,8 @@ function onSave(project: Project) {
   selectedProject.value = null;
 }
 
-function logout() {
-  auth.logout();
+const logout = (): void => {
+  auth.logout()
   navigateTo("/login");
 }
 

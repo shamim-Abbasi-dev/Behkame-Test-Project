@@ -6,17 +6,13 @@ export default defineNuxtRouteMiddleware((to) => {
   const auth = useAuthStore();
  
 
-  const publicPages = ['/'  ,'/login'];
 
-  if (publicPages.includes(to.path)) {
-    return; 
-  }
 
   if (auth.isAuth && auth.token &&  to.path === '/login') {
     return navigateTo('/groups');
   }
 
-  if (!auth.token && !publicPages.includes(to.path) && !auth.isAuth) {
+  if (!auth.token && !auth.isAuth) {
     return navigateTo('/' ,{ external: true });
   }
 });

@@ -33,13 +33,11 @@
     </button>
   </div>
 
-  <DeleteModal v-model="showDelete" @confirm="confirmDelete" />
+  <ModalsDeleteModal v-model="showDelete" @confirm="confirmDelete" />
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import DeleteModal from './modals/deleteModal.vue'
-import type { Task } from '@/stores/task'
+import type { Task } from '@/models/task'
 
 const props = defineProps<{ task: Task }>()
 const emit = defineEmits<{

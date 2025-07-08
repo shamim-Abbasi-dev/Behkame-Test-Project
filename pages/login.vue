@@ -31,16 +31,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import { useAuthStore } from '~/stores/auth';
-import { navigateTo } from 'nuxt/app';
-
 
 const auth = useAuthStore();
 const password = ref<string>('');
 const error = ref<string>('');
 
-
+                    
 const onSubmit = (): void => {
   error.value = '';  
 
